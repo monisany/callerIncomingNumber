@@ -6,16 +6,17 @@ import android.content.Intent;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.widget.Toast;
 
 public class CallerNumberReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Toast.makeText(context, "niekto vola", Toast.LENGTH_LONG).show();
+
         TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         CallerNumberListener listener = new CallerNumberListener();
         tm.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);
+//        after phone state changed receiver is unregistered, because onReceive method is done
+        tm.listen(listener, PhoneStateListener.LISTEN_NONE);
     }
 
     private class CallerNumberListener extends PhoneStateListener {
