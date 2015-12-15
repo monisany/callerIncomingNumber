@@ -3,9 +3,11 @@ package com.orderlord.caller;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+
 
 public class CallerNumberReceiver extends BroadcastReceiver {
 
@@ -28,5 +30,14 @@ public class CallerNumberReceiver extends BroadcastReceiver {
             if (state == TelephonyManager.CALL_STATE_RINGING)
                 Log.v("Orderlord", "Orderlord: incomingNumber= " + incomingNumber);
         }
+
+        private class PostNumber extends AsyncTask<String, Void, Integer> {
+
+            protected Integer doInBackground(String... incomingNumber) {
+
+                return 0;
+            }
+        }
+
     }
 }
