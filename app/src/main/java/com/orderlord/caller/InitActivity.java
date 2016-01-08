@@ -12,6 +12,7 @@ public class InitActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Toast.makeText(this, "Application Caller started.", Toast.LENGTH_LONG).show();
         finish();
     }
 }

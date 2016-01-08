@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -25,9 +26,12 @@ import java.util.List;
 
 public class CallerNumberReceiver extends BroadcastReceiver {
 
+    Context context;
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
+        context = this.context;
         TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         CallerNumberListener listener = new CallerNumberListener();
         tm.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);
@@ -42,7 +46,7 @@ public class CallerNumberReceiver extends BroadcastReceiver {
             super.onCallStateChanged(state, incomingNumber);
 
             if (state == TelephonyManager.CALL_STATE_RINGING) {
-                Log.v("Orderlord", "Orderlord: incomingNumber= " + incomingNumber);
+                Log.v("Orderlord", "incomingNumber= " + incomingNumber);
                 new PostNumber().execute(incomingNumber);
             }
         }
@@ -56,7 +60,7 @@ public class CallerNumberReceiver extends BroadcastReceiver {
                 HttpPost httpPost = new HttpPost(url);
                 List<NameValuePair> params = new ArrayList();
                 params.add(new BasicNameValuePair("number", incomingNumbers[0]));
-                Log.v("Orderlord", "Orderlord: posting params: " + params);
+                Log.v("Orderlord", "posting params: " + params);
 
                 // Url Encoding the POST parameters
                 try {
@@ -71,7 +75,7 @@ public class CallerNumberReceiver extends BroadcastReceiver {
                 try {
                     HttpResponse response = httpClient.execute(httpPost);
                     // writing response to log
-                    Log.v("Orderlord Http Response:", response.toString());
+                    Log.v("Orderlord response", response.toString());
 
                 } catch (ClientProtocolException e) {
                     // writing exception to log
@@ -80,6 +84,8 @@ public class CallerNumberReceiver extends BroadcastReceiver {
                 } catch (IOException e) {
                     // writing exception to log
                     e.printStackTrace();
+                    Toast.makeText(context, "Application cannot work without Internet connection.",
+                            Toast.LENGTH_SHORT).show();
                 }
 
                 return 0;
