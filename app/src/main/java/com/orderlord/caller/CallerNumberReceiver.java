@@ -8,6 +8,20 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class CallerNumberReceiver extends BroadcastReceiver {
 
@@ -27,16 +41,50 @@ public class CallerNumberReceiver extends BroadcastReceiver {
         public void onCallStateChanged(int state, String incomingNumber) {
             super.onCallStateChanged(state, incomingNumber);
 
-            if (state == TelephonyManager.CALL_STATE_RINGING)
+            if (state == TelephonyManager.CALL_STATE_RINGING) {
                 Log.v("Orderlord", "Orderlord: incomingNumber= " + incomingNumber);
+                new PostNumber().execute(incomingNumber);
+            }
         }
 
         private class PostNumber extends AsyncTask<String, Void, Integer> {
 
-            protected Integer doInBackground(String... incomingNumber) {
+            protected Integer doInBackground(String... incomingNumbers) {
+
+                String url = "http://requestb.in/yzb21dyz";
+                HttpClient httpClient = new DefaultHttpClient();
+                HttpPost httpPost = new HttpPost(url);
+                List<NameValuePair> params = new ArrayList();
+                params.add(new BasicNameValuePair("number", incomingNumbers[0]));
+                Log.v("Orderlord", "Orderlord: posting params: " + params);
+
+                // Url Encoding the POST parameters
+                try {
+                    httpPost.setEntity(new UrlEncodedFormEntity(params));
+                }
+                catch (UnsupportedEncodingException e) {
+                    // writing error to Log
+                    e.printStackTrace();
+                }
+
+                // Making HTTP Request
+                try {
+                    HttpResponse response = httpClient.execute(httpPost);
+                    // writing response to log
+                    Log.v("Orderlord Http Response:", response.toString());
+
+                } catch (ClientProtocolException e) {
+                    // writing exception to log
+                    e.printStackTrace();
+
+                } catch (IOException e) {
+                    // writing exception to log
+                    e.printStackTrace();
+                }
 
                 return 0;
             }
+
         }
 
     }
