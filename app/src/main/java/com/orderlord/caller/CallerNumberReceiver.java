@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -26,16 +25,12 @@ import java.util.List;
 
 public class CallerNumberReceiver extends BroadcastReceiver {
 
-    Context context;
-
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        context = this.context;
         TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         CallerNumberListener listener = new CallerNumberListener();
         tm.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);
-//        after phone state changed receiver is unregistered, because onReceive method is done
         tm.listen(listener, PhoneStateListener.LISTEN_NONE);
     }
 
@@ -46,8 +41,9 @@ public class CallerNumberReceiver extends BroadcastReceiver {
             super.onCallStateChanged(state, incomingNumber);
 
             if (state == TelephonyManager.CALL_STATE_RINGING) {
-                Log.v("Orderlord", "incomingNumber= " + incomingNumber);
-                new PostNumber().execute(incomingNumber);
+                if (incomingNumber != null) {
+                    new PostNumber().execute(incomingNumber);
+                }
             }
         }
 
@@ -55,12 +51,11 @@ public class CallerNumberReceiver extends BroadcastReceiver {
 
             protected Integer doInBackground(String... incomingNumbers) {
 
-                String url = "http://requestb.in/yzb21dyz";
+                String url = "http://requestb.in/1clcbul1";
                 HttpClient httpClient = new DefaultHttpClient();
                 HttpPost httpPost = new HttpPost(url);
                 List<NameValuePair> params = new ArrayList();
                 params.add(new BasicNameValuePair("number", incomingNumbers[0]));
-                Log.v("Orderlord", "posting params: " + params);
 
                 // Url Encoding the POST parameters
                 try {
@@ -84,8 +79,6 @@ public class CallerNumberReceiver extends BroadcastReceiver {
                 } catch (IOException e) {
                     // writing exception to log
                     e.printStackTrace();
-                    Toast.makeText(context, "Application cannot work without Internet connection.",
-                            Toast.LENGTH_SHORT).show();
                 }
 
                 return 0;
